@@ -1,6 +1,7 @@
 // src/bot/callbackHandlers.ts
 import TelegramBot from 'node-telegram-bot-api';
 import { sendProximosJogos } from './commands/proximosJogos';
+import { sendUltimosJogos } from './commands/ultimosJogos';
 
 export function handleCallbackQuery(bot: TelegramBot) {
     bot.on('callback_query', async (callbackQuery) => {
@@ -23,6 +24,13 @@ export function handleCallbackQuery(bot: TelegramBot) {
                     await sendProximosJogos(bot, chatId, loading.message_id);
                 };
 
+                break;
+            
+            case 'ultimosjogos':
+                handler = async () => {
+                    const loading = await bot.sendMessage(chatId, '🔍 Buscando partidas...');
+                    await sendUltimosJogos(bot, chatId, loading.message_id);
+                };
                 break;
         }
 
