@@ -1,11 +1,10 @@
+# 🤖 Bot da FURIA CS2 no Telegram
 
-# 🤖 Bot Oficial da FURIA CS2 no Telegram
+> Este projeto foi desenvolvido como parte de um desafio técnico para uma vaga de desenvolvedor na FURIA Esports.
 
-Este é um bot de Telegram que fornece informações atualizadas sobre o time de CS2 da FURIA, incluindo jogos passados, próximos confrontos, lineup atual e últimas notícias.
+Este é um bot de Telegram desenvolvido em Node.js com TypeScript que fornece informações atualizadas sobre o time de CS2 da FURIA Esports.
 
-👉 [Acesse o bot no Telegram](https://t.me/O_mais_novo_furioso_bot)
-
-## 📦 Funcionalidades
+## 📌 Funcionalidades
 
 - `/start`: Mostra o menu inicial com botões interativos.
 - `/proximosjogos`: Lista os próximos jogos da FURIA com data, campeonato e adversário.
@@ -17,36 +16,40 @@ Cada comando também pode ser acessado por meio de botões no menu principal, e 
 
 ## 🛠️ Tecnologias e APIs
 
-- **Node.js**
-- **TypeScript**
-- **node-telegram-bot-api**: Integração com a API do Telegram.
-- **PandaScore API**: Usada para obter dados dos jogos e lineup.
-- **Cheerio + Puppeteer**: Utilizados para fazer scraping de notícias.
-- **dotenv**: Para gerenciamento de variáveis de ambiente.
+- [Node.js](https://nodejs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)
+- [PandaScore API](https://developers.pandascore.co/) – para dados de jogos e lineup
+- [Draft5 API](https://draft5.gg/) – para notícias da equipe
 
-## 🚀 Como rodar o projeto localmente
+## 🚀 Instalação
 
 1. Clone o repositório:
+
    ```bash
-   git clone https://github.com/seu-usuario/furia-telegram-bot.git
-   cd furia-telegram-bot
+   git clone https://github.com/ygor-ccarvalho/telegram-bot-furia.git
+   cd telegram-bot-furia
    ```
 
 2. Instale as dependências:
+
    ```bash
    npm install
    ```
 
-3. Crie um arquivo `.env` com sua token do bot e do Pandscore:
-   ```
-   TELEGRAM_BOT_TOKEN=your_bot_token_here
-   PANDASCORE_API_KEY=your_API_token_here
+3. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+   ```env
+   TELEGRAM_BOT_TOKEN=seu_token_aqui
+   PANDASCORE_API_KEY=seu_token_aqui
    ```
 
-4. Inicie o bot em modo desenvolvimento:
+4. Inicie o bot em modo de desenvolvimento:
+
    ```bash
    npm run dev
    ```
+
 
 ## 📂 Estrutura do Projeto
 
