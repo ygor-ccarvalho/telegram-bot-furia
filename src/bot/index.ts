@@ -6,7 +6,7 @@ import { handleCallbackQuery } from './callbackHandlers';
 import { handleUnknownCommand } from './commands/comandoDesconhecido';
 import { handleProximosJogos } from './commands/proximosJogos';
 import { handleUltimosJogos } from './commands/ultimosJogos';
-
+import { handleLineupCommand } from './commands/lineup';
 
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
@@ -16,7 +16,7 @@ handleStartCommand(bot);
 handleUnknownCommand(bot);
 handleProximosJogos(bot);
 handleUltimosJogos(bot);
-
+handleLineupCommand(bot);
 
 
 
