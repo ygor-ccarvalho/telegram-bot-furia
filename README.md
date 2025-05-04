@@ -1,8 +1,8 @@
-🤖 Bot da FURIA CS2 no Telegram
+# 🤖 Bot da FURIA CS2 no Telegram
 
-Este projeto foi desenvolvido como parte de um desafio técnico para uma vaga de desenvolvedor na FURIA Esports.
+>Este projeto foi desenvolvido como parte de um desafio técnico para uma vaga de desenvolvedor na FURIA Esports.
 
-Este é um bot de Telegram desenvolvido em Node.js com TypeScript que fornece informações atualizadas sobre o time de CS2 da FURIA Esports.
+Trata-se de um bot de Telegram desenvolvido em Node.js com TypeScript que fornece informações atualizadas sobre o time de CS2 da FURIA Esports.
 
 ## 🚀 Bot em Produção
 
@@ -10,7 +10,7 @@ O bot está disponível publicamente e em execução no Telegram:
 
 🔗 [@O_mais_novo_furioso_bot](https://t.me/O_mais_novo_furioso_bot)
 
-Este bot está hospedado no [Render](https://render.com), permitindo testes em tempo real sem necessidade de instalação local.
+Este bot está hospedado no [Railway](https://railway.app), permitindo testes em tempo real sem necessidade de instalação local.
 
 ## 📌 Funcionalidades
 
@@ -20,24 +20,23 @@ Este bot está hospedado no [Render](https://render.com), permitindo testes em t
 - `/lineup`: Exibe a lineup atual da FURIA.  
 - `/noticias`: Busca e exibe as últimas notícias relacionadas ao time.  
 
-Cada comando também pode ser acessado por meio de botões no menu principal, e o bot exibe mensagens de carregamento enquanto busca os dados.
+Cada comando também pode ser acessado por meio de botões no menu principal. O bot exibe mensagens de carregamento enquanto busca os dados e fornece feedback ao usuário em caso de erro.
 
 ## 🛠️ Tecnologias e APIs
 
 - Node.js  
 - TypeScript  
-- node-telegram-bot-api  
-- PandaScore API – para dados de jogos e lineup  
-- Draft5 API – para notícias da equipe  
+- [node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)  
+- [PandaScore API](https://pandascore.co/) – para dados de jogos e lineup  
+- [Draft5 API](https://draft5.gg) – para notícias da equipe  
 
-## 🚀 Instalação
+## 🧪 Instalação Local
 
-Clone o repositório:
+1. Clone o repositório:
 
-```bash
-git clone https://github.com/ygor-ccarvalho/telegram-bot-furia.git
-cd telegram-bot-furia
-
+   ```bash
+   git clone https://github.com/ygor-ccarvalho/telegram-bot-furia.git
+   cd telegram-bot-furia
    ```
 
 2. Instale as dependências:

@@ -14,8 +14,6 @@ export function handleCallbackQuery(bot: TelegramBot) {
 
         await bot.answerCallbackQuery(callbackQuery.id);
 
-        await bot.answerCallbackQuery(callbackQuery.id);
-
         let handler: (() => void) | null = null;
 
         switch (data) {
@@ -41,6 +39,7 @@ export function handleCallbackQuery(bot: TelegramBot) {
                     await sendLineup(bot, chatId, loading.message_id);
                 };
                 break;
+            
             case 'noticias':
                 handler = async () => {
                     const loading = await bot.sendMessage(chatId, '🔍 Buscando notícias...');
