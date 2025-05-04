@@ -7,6 +7,7 @@ import { handleUnknownCommand } from './commands/comandoDesconhecido';
 import { handleProximosJogos } from './commands/proximosJogos';
 import { handleUltimosJogos } from './commands/ultimosJogos';
 import { handleLineupCommand } from './commands/lineup';
+import { handleNoticias } from './commands/noticias';
 
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
@@ -17,7 +18,7 @@ handleUnknownCommand(bot);
 handleProximosJogos(bot);
 handleUltimosJogos(bot);
 handleLineupCommand(bot);
-
+handleNoticias(bot);
 
 
 
