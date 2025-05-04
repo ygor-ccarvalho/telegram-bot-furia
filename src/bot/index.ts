@@ -4,13 +4,14 @@ import { TELEGRAM_BOT_TOKEN } from '../config/env';
 import { handleStartCommand } from './commands/start';
 import { handleCallbackQuery } from './callbackHandlers';
 import { handleUnknownCommand } from './commands/comandoDesconhecido';
-
+import { handleProximosJogos } from './commands/proximosJogos';
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 // comandos digitados
 handleStartCommand(bot);
 handleUnknownCommand(bot);
+handleProximosJogos(bot);
 
 // botões (callback_query)
 handleCallbackQuery(bot);
