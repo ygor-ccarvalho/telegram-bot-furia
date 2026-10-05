@@ -1,31 +1,28 @@
-// proximosJogos.ts
 import TelegramBot from 'node-telegram-bot-api';
-import { getNextMacthes } from '../services/pandscore/getNextMatches';
+import { getNextMatches } from '../services/pandscore/getNextMatches';
 import { formatDate } from '../utils/utils';
 import { TEAM } from '../../config/team';
 import { commandRegexes } from '../../config/commands';
+import { editOrSend } from '../utils/reply';
 
 export function handleProximosJogos(bot: TelegramBot) {
     bot.onText(commandRegexes.proximosJogos, async (msg) => {
         const chatId = msg.chat.id;
-        const loading = await bot.sendMessage(chatId, '🔍 Buscando próximos jogos...');
-        await sendProximosJogos(bot, chatId, loading.message_id);
+        try {
+            const loading = await bot.sendMessage(chatId, '🔍 Buscando próximos jogos...');
+            await sendProximosJogos(bot, chatId, loading.message_id);
+        } catch (error) {
+            console.error('/proximosjogos: ', error);
+        }
     });
 }
 
 export async function sendProximosJogos(bot: TelegramBot, chatId: number, loadingMessageId?: number) {
     try {
-        const matches = await getNextMacthes();
+        const matches = await getNextMatches();
 
         if (matches.length === 0) {
-            if (loadingMessageId) {
-                await bot.editMessageText('Nenhum jogo encontrado.', {
-                    chat_id: chatId,
-                    message_id: loadingMessageId,
-                });
-            } else {
-                await bot.sendMessage(chatId, 'Nenhum jogo encontrado.');
-            }
+            await editOrSend(bot, chatId, 'Nenhum jogo encontrado.', loadingMessageId);
             return;
         }
 
@@ -34,29 +31,22 @@ export async function sendProximosJogos(bot: TelegramBot, chatId: number, loadin
         for (const match of matches) {
             const date = formatDate(match.begin_at);
             const serieName = match.serie?.full_name || 'Campeonato desconhecido';
-            const team1 = match.opponents?.[0]?.opponent;
-            const team2 = match.opponents?.[1]?.opponent;
+            const team1 = match.opponents?.[0]?.opponent?.name ?? 'A definir';
+            const team2 = match.opponents?.[1]?.opponent?.name ?? 'A definir';
 
             message += `
 📅 *${date}*
 🏆 *${serieName}*
-🎮 *${team1?.name}* vs *${team2?.name}*
+🎮 *${team1}* vs *${team2}*
 ———————————————\n`;
         }
 
-        if (loadingMessageId) {
-            await bot.editMessageText(message.trim(), {
-                chat_id: chatId,
-                message_id: loadingMessageId,
-                parse_mode: 'Markdown'
-            });
-        } else {
-            await bot.sendMessage(chatId, message.trim(), { parse_mode: 'Markdown' });
-        }
+        await editOrSend(bot, chatId, message.trim(), loadingMessageId, 'Markdown');
 
     } catch (error) {
-        console.error('/proximosjogos:', error);
-        await bot.sendMessage(chatId, '⚠️ Erro ao buscar os próximos jogos.');
+        console.error('/proximosjogos: ', error);
+        const errorMessage = 'Ocorreu um erro ao buscar os próximos jogos.';
+        await editOrSend(bot, chatId, errorMessage, loadingMessageId);
     }
 }
 
