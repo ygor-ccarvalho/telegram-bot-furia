@@ -3,11 +3,17 @@ import { getLastMatches } from '../services/pandscore/getLastMatches';
 import { formatDate } from '../utils/utils';
 import { TEAM } from '../../config/team';
 import { commandRegexes } from '../../config/commands';
+import { editOrSend } from '../utils/reply';
 
 export function handleUltimosJogos(bot: TelegramBot) {
     bot.onText(commandRegexes.ultimosJogos, async (msg) => {
-        const loading = await bot.sendMessage(msg.chat.id, '🔍 Buscando partidas...');
-        await sendUltimosJogos(bot, msg.chat.id, loading.message_id);
+        const chatId = msg.chat.id;
+        try {
+            const loading = await bot.sendMessage(chatId, '🔍 Buscando partidas...');
+            await sendUltimosJogos(bot, chatId, loading.message_id);
+        } catch (error) {
+            console.error('/ultimosjogos: ', error);
+        }
     });
 }
 
@@ -16,14 +22,7 @@ export async function sendUltimosJogos(bot: TelegramBot, chatId: number, loading
         const matches = await getLastMatches();
 
         if (matches.length === 0) {
-            if (loadingMessageId) {
-                await bot.editMessageText('Nenhuma partida encontrada.', {
-                    chat_id: chatId,
-                    message_id: loadingMessageId,
-                });
-            } else {
-                await bot.sendMessage(chatId, 'Nenhuma partida encontrada.');
-            }
+            await editOrSend(bot, chatId, 'Nenhuma partida encontrada.', loadingMessageId);
             return;
         }
 
@@ -62,18 +61,11 @@ export async function sendUltimosJogos(bot: TelegramBot, chatId: number, loading
 ———————————————\n`;
         }
 
-        if (loadingMessageId) {
-            await bot.editMessageText(message.trim(), {
-                chat_id: chatId,
-                message_id: loadingMessageId,
-                parse_mode: 'Markdown'
-            });
-        } else {
-            await bot.sendMessage(chatId, message.trim(), { parse_mode: 'Markdown' });
-        }
+        await editOrSend(bot, chatId, message.trim(), loadingMessageId, 'Markdown');
 
     } catch (error) {
-        console.error('/ultimosjogos:', error);
-        await bot.sendMessage(chatId, '⚠️ Erro ao buscar partidas.');
+        console.error('/ultimosjogos: ', error);
+        const errorMessage = 'Ocorreu um erro ao buscar os últimos jogos.';
+        await editOrSend(bot, chatId, errorMessage, loadingMessageId);
     }
 }
