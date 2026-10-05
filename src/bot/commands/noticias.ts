@@ -1,8 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { getNews } from '../services/draft5/getNews';
+import { commandRegexes } from '../../config/commands';
 
 export function handleNoticias(bot: TelegramBot) {
-    bot.onText(/\/noticias/, async (msg) => {
+    bot.onText(commandRegexes.noticias, async (msg) => {
         const loading = await bot.sendMessage(msg.chat.id, '🔍 Buscando notícias...');
         await sendNoticias(bot, msg.chat.id, loading.message_id);
     });
@@ -13,7 +14,6 @@ export async function sendNoticias(bot: TelegramBot, chatId: number, loadingMess
         const noticias = await getNews();
 
         if (loadingMessageId) {
-            // Deleta a mensagem de "carregando" se vamos enviar várias mensagens de imagem em seguida
             await bot.deleteMessage(chatId, loadingMessageId);
         }
 

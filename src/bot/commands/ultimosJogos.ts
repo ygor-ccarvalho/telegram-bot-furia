@@ -1,11 +1,11 @@
-// ultimosJogos.ts
 import TelegramBot from 'node-telegram-bot-api';
 import { getLastMatches } from '../services/pandscore/getLastMatches';
 import { formatDate } from '../utils/utils';
 import { TEAM } from '../../config/team';
+import { commandRegexes } from '../../config/commands';
 
 export function handleUltimosJogos(bot: TelegramBot) {
-    bot.onText(/\/ultimosjogos/, async (msg) => {
+    bot.onText(commandRegexes.ultimosJogos, async (msg) => {
         const loading = await bot.sendMessage(msg.chat.id, '🔍 Buscando partidas...');
         await sendUltimosJogos(bot, msg.chat.id, loading.message_id);
     });

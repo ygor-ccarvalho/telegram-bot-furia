@@ -1,8 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { getLineup } from '../services/pandscore/getLineup';
+import { commandRegexes } from '../../config/commands';
 
 export function handleLineupCommand(bot: TelegramBot) {
-    bot.onText(/\/lineup/, async (msg) => {
+    bot.onText(commandRegexes.lineup, async (msg) => {
         const chatId = msg.chat.id;
         const loading = await bot.sendMessage(chatId, '🔍 Buscando time atual...');
         await sendLineup(bot, chatId, loading.message_id);

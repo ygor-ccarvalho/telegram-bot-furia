@@ -3,9 +3,10 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getNextMacthes } from '../services/pandscore/getNextMatches';
 import { formatDate } from '../utils/utils';
 import { TEAM } from '../../config/team';
+import { commandRegexes } from '../../config/commands';
 
 export function handleProximosJogos(bot: TelegramBot) {
-    bot.onText(/\/proximosjogos/, async (msg) => {
+    bot.onText(commandRegexes.proximosJogos, async (msg) => {
         const chatId = msg.chat.id;
         const loading = await bot.sendMessage(chatId, '🔍 Buscando próximos jogos...');
         await sendProximosJogos(bot, chatId, loading.message_id);
