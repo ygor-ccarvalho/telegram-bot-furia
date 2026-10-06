@@ -2,7 +2,7 @@ import { PANDASCORE_API_KEY } from '../../../config/env';
 import axios from 'axios';
 import { TEAM } from '../../../config/team';
 
-export async function getNextMacthes(): Promise<any[]> {
+export async function getNextMatches(): Promise<any[]> {
     const res = await axios.get('https://api.pandascore.co/csgo/matches/upcoming', {
         params: {
             'filter[opponent_id]': TEAM.id,
