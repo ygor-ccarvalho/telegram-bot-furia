@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev src/bot/index.ts"
+    "build": "tsc",
+    "start": "node dist/bot/index.js",
+    "dev": "ts-node src/bot/index.ts"
   },
   "keywords": [],
   "author": "",
