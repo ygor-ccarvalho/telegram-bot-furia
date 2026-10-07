@@ -1,14 +1,13 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { Composer, Context } from 'grammy';
 import { TEAM } from '../../config/team';
-import { commandRegexes } from '../../config/commands';
 
-export function handleStart(bot: TelegramBot) {
-    bot.onText(commandRegexes.start, async (msg) => {
-        await sendStartMenu(bot, msg.chat.id);
-    });
-}
+export const startComposer = new Composer();
 
-export async function sendStartMenu(bot: TelegramBot, chatId: number) {
+startComposer.command('start', async (ctx) => {
+    await sendStartMenu(ctx);
+});
+
+export async function sendStartMenu(ctx: Context): Promise<void> {
     try {
         const text =
             `⚡      *Bot Oficial da ${TEAM.nome.toUpperCase()} CS2*        ⚡\n\n` +
@@ -19,7 +18,7 @@ export async function sendStartMenu(bot: TelegramBot, chatId: number) {
             `📰 /noticias: fique por dentro das novidades!\n\n` +
             `Escolha uma opção abaixo:`;
 
-        await bot.sendMessage(chatId, text, {
+        await ctx.reply(text, {
             parse_mode: 'Markdown',
             reply_markup: {
                 inline_keyboard: [
