@@ -11,9 +11,9 @@ export async function getNews(): Promise<Noticia[]> {
 
     const noticiasResponse = await axios.get<Draft5Response>(`https://api.draft5.gg/news`, {
         params: {
-            'filter[page]': 1,
-            'filter[amount]': 10,
-            'filter[teams]': TEAM.draft5Id,
+            page: 1,
+            amount: 10,
+            teams: TEAM.draft5Id,
         },
         timeout: 8000,
     });
