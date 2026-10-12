@@ -1,25 +1,20 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { Context } from 'grammy';
+import type { ParseMode } from 'grammy/types';
 
 export async function editOrSend(
-    bot: TelegramBot,
-    chatId: number,
+    ctx: Context,
     text: string,
     loadingMessageId?: number,
-    parseMode?: TelegramBot.ParseMode
+    parseMode?: ParseMode
 ): Promise<void> {
-
+    const chatId = ctx.chat?.id;
     try {
-        if (loadingMessageId) {
-            await bot.editMessageText(text, {
-                chat_id: chatId,
-                message_id: loadingMessageId,
-                parse_mode: parseMode
-            });
+        if (loadingMessageId && chatId) {
+            await ctx.api.editMessageText(chatId, loadingMessageId, text, { parse_mode: parseMode });
         } else {
-            await bot.sendMessage(chatId, text, {parse_mode: parseMode});
+            await ctx.reply(text, { parse_mode: parseMode });
         }
     } catch (error) {
         console.error('editOrSend: ', error);
     }
-
 }
