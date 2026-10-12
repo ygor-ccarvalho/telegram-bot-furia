@@ -10,7 +10,7 @@ startComposer.command('start', async (ctx) => {
 export async function sendStartMenu(ctx: Context): Promise<void> {
     try {
         const text =
-            `⚡      *Bot Oficial da ${TEAM.nome.toUpperCase()} CS2*        ⚡\n\n` +
+            `⚡      *Bot Oficial da ${TEAM.name.toUpperCase()} CS2*        ⚡\n\n` +
             `*Veja tudo sobre o time:*\n\n` +
             `📅 /proximosjogos: confira as datas e adversários.\n` +
             `🕹️ /ultimosjogos: veja os últimos 5 resultados.\n` +
