@@ -1,6 +1,6 @@
 import { Composer, type Context } from 'grammy';
 import { getNextMatches } from '../services/pandascore/getNextMatches';
-import { formatDate } from '../utils/utils';
+import { formatDateTime } from '../utils/utils';
 import { TEAM } from '../../config/team';
 import { editOrSend } from '../utils/reply';
 
@@ -21,20 +21,20 @@ export async function sendProximosJogos(ctx: Context): Promise<void> {
             return;
         }
 
-        let message = `*📅 Próximos jogos da ${TEAM.nome}:*\n\n`;
+        let message = `*📅 Próximos jogos da ${TEAM.name}:*\n\n`;
 
         for (const match of matches) {
-            const date = formatDate(match.begin_at);
-            const serieName = match.serie?.full_name ?? 'Campeonato desconhecido';
+            const date = formatDateTime(match.scheduled_at);
+            const serieName = [match.league?.name, match.serie?.full_name, match.tournament?.name].filter(Boolean);
+            const serieNameFormatted = serieName.join(' - ') || 'Informações indisponíveis';
             const team1 = match.opponents?.[0]?.opponent?.name ?? 'A definir';
             const team2 = match.opponents?.[1]?.opponent?.name ?? 'A definir';
             message += `
  📅 *${date}*
- 🏆 *${serieName}*
+ 🏆 *${serieNameFormatted}*
  🎮 *${team1}* vs *${team2}*
  ———————————————\n`;
         }
-
         await editOrSend(ctx, message, loading.message_id, 'Markdown');
 
     } catch (error) {
