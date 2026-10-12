@@ -1,6 +1,5 @@
 import { Composer, type Context } from 'grammy';
 import { sendStartMenu } from './start';
-import { editOrSend } from '../utils/reply';
 
 export const comandoDesconhecidoComposer = new Composer();
 
