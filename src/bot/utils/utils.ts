@@ -1,12 +1,16 @@
 
-export function formatDate(dateString: string): string {
+export function formatDateTime(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
+    return date.toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
         day: '2-digit',
-        month: 'long',
+        month: '2-digit',
         year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
+
 export function getCountryFlag(code: string): string {
     if (!code || code.length !== 2) return '🏳️';
 
