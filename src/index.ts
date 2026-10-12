@@ -8,3 +8,5 @@ bot.start({
     onStart: (info) => console.log(`Rodando como @${info.username}`),
 });
 
+process.once('SIGINT', () => bot.stop());
+process.once('SIGTERM', () => bot.stop());
