@@ -1,8 +1,9 @@
 import { Composer, type Context } from 'grammy';
 import { getLastMatches } from '../services/pandascore/getLastMatches';
-import { formatDateTime } from '../utils/utils';
+import { formatMatch } from '../formatters/match';
 import { TEAM } from '../../config/team';
 import { editOrSend } from '../utils/reply';
+import { toMatchCard } from '../mappers/match';
 
 export const ultimosJogosComposer = new Composer();
 
@@ -11,7 +12,6 @@ ultimosJogosComposer.command('ultimosjogos', async (ctx) => {
 });
 
 export async function sendUltimosJogos(ctx: Context): Promise<void> {
-
     const loading = await ctx.reply('🔍 Buscando partidas...');
 
     try {
@@ -21,31 +21,11 @@ export async function sendUltimosJogos(ctx: Context): Promise<void> {
             return;
         }
 
-        let message = `*🕹️ Últimos jogos da ${TEAM.name}:*\n\n`;
+        const cards = matches.map(toMatchCard);
+        const body = cards.map(c => formatMatch(c, TEAM.name)).join('\n\n');
+        const message = `<b>🕹️ Últimos jogos da ${TEAM.name}:</b>\n\n${body}`;
 
-        for (const match of matches) {
-            const date = formatDateTime(match.scheduled_at);
-            const serieName = [match.league?.name, match.serie?.full_name, match.tournament?.name].filter(Boolean);
-            const serieNameFormatted = serieName.join(' - ') || 'Informações indisponíveis';
-
-            const team1 = match.opponents?.[0]?.opponent;
-            const team2 = match.opponents?.[1]?.opponent;
-
-            const score1 = match.results?.find(r => r.team_id === team1?.id)?.score ?? 0;
-            const score2 = match.results?.find(r => r.team_id === team2?.id)?.score ?? 0;
-
-            const winner = match.winner?.name ?? 'Sem vencedor';
-
-            message += `
- 📅 *${date}*
- 🏆 *${serieNameFormatted}*
- 🎮 *${team1?.name ?? 'Desconhecido'}* vs *${team2?.name ?? 'Desconhecido'}*
- 📊 *Placar*: ${score1} - ${score2}
- 🥇 *Vencedor*: ${winner}
- ———————————————\n`;
-        }
-
-        await editOrSend(ctx, message, loading.message_id, 'Markdown');
+        await editOrSend(ctx, message, loading.message_id, 'HTML');
 
     } catch (error) {
         console.error('/ultimosjogos: ', error);
