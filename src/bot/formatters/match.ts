@@ -1,21 +1,59 @@
 import { escapeHtml } from "../utils/utils";
 
+type Resultado = NonNullable<MatchCard['result']>;
+
+const resultadoIcones: Record<Resultado, string> = {
+    win: '✅',
+    loss: '❌',
+    draw: '⏸️'
+};
+
 export interface MatchCard {
-    date: string;
+    status: 'upcoming' | 'live' | 'finished';
+    opponent: string;
+    opponentFlag: string;
     championship: string;
-    team1: string;
-    team2: string;
-    score1?: number;
-    score2?: number;
-    winner?: string;
+    stage: string;
+    bestOf: number;
+    date: string;
+    forfeit: boolean;
+    score?: { furia: number; opponent: number };
+    result?: 'win' | 'loss' | 'draw';
 }
 
-export function formatMatch(data: MatchCard): string {
+export function formatMatch(card: MatchCard, teamName: string): string {
     const lines: string[] = [];
-    lines.push(`📅 ${data.date}`);
-    lines.push(`🏆 ${escapeHtml(data.championship)}`);
-    lines.push(`🎮 ${escapeHtml(data.team1)} vs ${escapeHtml(data.team2)}`);
-    if (data.score1 !== undefined && data.score2 !== undefined) { lines.push(`📊 Placar: ${data.score1} - ${data.score2}`); }
-    if (data.winner) { lines.push(`🥇 Vencedor: ${escapeHtml(data.winner)}`); }
+
+    let icone: string;
+    const nomeTime = escapeHtml(teamName);
+    const nomeAdversario = escapeHtml(card.opponent);
+
+    let confronto = card.score ? `${nomeTime} ${card.score.furia} x ${card.score.opponent} ${nomeAdversario}` : `${nomeTime} vs ${nomeAdversario}`;
+
+    switch (card.status) {
+        case 'upcoming':
+            icone = '⏳';
+            break;
+        case 'live':
+            icone = '🔴';
+            confronto += ' · AO VIVO';
+            break;
+        case 'finished':
+            icone = card.result ? resultadoIcones[card.result] : '🚫';
+            break;
+    }
+
+    if (card.forfeit) {
+        confronto += ' (W.O.)';
+    }
+
+    lines.push(`${icone} <b>${confronto}</b> ${card.opponentFlag}`);
+    lines.push(`🏆 ${escapeHtml(card.championship)} · MD${card.bestOf}`);
+
+    if (card.stage) {
+        lines.push(`📍 ${escapeHtml(card.stage)}`);
+    }
+
+    lines.push(`📅 ${card.date}`);
     return lines.join('\n');
 }
