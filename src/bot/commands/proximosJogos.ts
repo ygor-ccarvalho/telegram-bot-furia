@@ -1,8 +1,9 @@
 import { Composer, type Context } from 'grammy';
 import { getNextMatches } from '../services/pandascore/getNextMatches';
-import { formatDateTime } from '../utils/utils';
+import { formatMatch } from '../formatters/match';
 import { TEAM } from '../../config/team';
 import { editOrSend } from '../utils/reply';
+import { toMatchCard } from '../mappers/match';
 
 export const proximosJogosComposer = new Composer();
 
@@ -11,31 +12,20 @@ proximosJogosComposer.command('proximosjogos', async (ctx) => {
 });
 
 export async function sendProximosJogos(ctx: Context): Promise<void> {
-
-    const loading = await ctx.reply('🔍 Buscando próximos jogos...');
+    const loading = await ctx.reply('🔍 Buscando partidas...');
 
     try {
         const matches = await getNextMatches();
         if (matches.length === 0) {
-            await editOrSend(ctx, 'Nenhum jogo encontrado.', loading.message_id);
+            await editOrSend(ctx, 'Nenhuma partida encontrada.', loading.message_id);
             return;
         }
 
-        let message = `*📅 Próximos jogos da ${TEAM.name}:*\n\n`;
+        const cards = matches.map(toMatchCard);
+        const body = cards.map(c => formatMatch(c, TEAM.name)).join('\n\n');
+        const message = `<b>🕹️ Próximos jogos da ${TEAM.name}:</b>\n\n${body}`;
 
-        for (const match of matches) {
-            const date = formatDateTime(match.scheduled_at);
-            const serieName = [match.league?.name, match.serie?.full_name, match.tournament?.name].filter(Boolean);
-            const serieNameFormatted = serieName.join(' - ') || 'Informações indisponíveis';
-            const team1 = match.opponents?.[0]?.opponent?.name ?? 'A definir';
-            const team2 = match.opponents?.[1]?.opponent?.name ?? 'A definir';
-            message += `
- 📅 *${date}*
- 🏆 *${serieNameFormatted}*
- 🎮 *${team1}* vs *${team2}*
- ———————————————\n`;
-        }
-        await editOrSend(ctx, message, loading.message_id, 'Markdown');
+        await editOrSend(ctx, message, loading.message_id, 'HTML');
 
     } catch (error) {
         console.error('/proximosjogos: ', error);

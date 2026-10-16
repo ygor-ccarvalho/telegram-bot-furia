@@ -25,10 +25,11 @@ export async function getNews(): Promise<Noticia[]> {
             titulo: n.postTitle,
             url: `https://draft5.gg/noticia/${n.postSlug}`,
             imagem: n.postImage,
-            dataPublicacao: n.postDate
+            resumo: n.postExcerpt ?? '',
         }));
 
-    cache.data = noticias; cache.expires = Date.now() + CACHE_TTL_MS;
+    cache.data = noticias;
+    cache.expires = Date.now() + CACHE_TTL_MS;
 
     return noticias;
 }
