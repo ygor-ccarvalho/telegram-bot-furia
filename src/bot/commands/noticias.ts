@@ -1,6 +1,7 @@
-import { Composer, type Context } from 'grammy';
+import { InlineKeyboard, Composer, type Context } from 'grammy';
 import { getNews } from '../services/draft5/getNews';
 import { editOrSend } from '../utils/reply';
+import { formatNewsCaption } from '../formatters/news';
 
 export const noticiasComposer = new Composer();
 
@@ -21,9 +22,11 @@ export async function sendNoticias(ctx: Context): Promise<void> {
         let enviadas = 0;
         for (const noticia of noticias) {
             try {
+                const botao = new InlineKeyboard().url('📖 Ler no DRAFT5', noticia.url);
                 await ctx.replyWithPhoto(noticia.imagem, {
-                    caption: `📰 *${noticia.titulo}*\n\n[🔗 Leia a notícia completa](${noticia.url})`,
-                    parse_mode: 'Markdown'
+                    caption: formatNewsCaption(noticia),
+                    parse_mode: 'HTML',
+                    reply_markup: botao,
                 });
                 enviadas++;
             } catch (error) {

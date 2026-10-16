@@ -1,8 +1,8 @@
 export interface Draft5News { 
     postTitle: string;
+    postExcerpt: string;
     postSlug: string;
     postImage: string;
-    postDate: string;
     meta?: {
         post_teams?: string
     }
@@ -18,5 +18,5 @@ export interface Noticia {
     titulo: string;
     url: string;
     imagem: string;
-    dataPublicacao: string;
+    resumo: string;
 }
