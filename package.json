@@ -1,24 +1,26 @@
 {
   "name": "furia-telegram-bot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Bot do Telegram com jogos, lineup e notícias da FURIA CS2",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "npm run build && npm start"
+    "dev": "npm run build && npm start",
+    "postinstall": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": ["telegram", "bot", "grammy", "furia", "cs2"],
+  "author": "Ygor Carvalho",
   "license": "ISC",
   "type": "commonjs",
-  "devDependencies": {
-    "@types/node": "^22.15.2",
-    "typescript": "^5.8.3"
-  },
   "dependencies": {
+    "@types/node": "^22.15.2",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
-    "grammy": "^1.46.0"
+    "grammy": "^1.46.0",
+    "typescript": "^5.8.3"
   }
 }
