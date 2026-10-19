@@ -11,7 +11,13 @@
   "engines": {
     "node": ">=20"
   },
-  "keywords": ["telegram", "bot", "grammy", "furia", "cs2"],
+  "keywords": [
+    "telegram",
+    "bot",
+    "grammy",
+    "furia",
+    "cs2"
+  ],
   "author": "Ygor Carvalho",
   "license": "ISC",
   "type": "commonjs",
@@ -20,6 +26,7 @@
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "grammy": "^1.46.0",
+    "mongodb": "^7.7.0",
     "typescript": "^5.8.3"
   }
 }
