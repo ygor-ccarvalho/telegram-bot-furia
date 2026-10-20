@@ -8,8 +8,9 @@ let client: MongoClient | null = null;
 export async function connectMongo(): Promise<void> {
     client = new MongoClient(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
     await client.connect();
-    mongoDb = client.db(MONGODB_DB);
-    await mongoDb.collection('cache').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    const db = client.db(MONGODB_DB);
+    await db.collection('cache').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    mongoDb = db;
     console.log('MongoDB conectado');
 }
 
