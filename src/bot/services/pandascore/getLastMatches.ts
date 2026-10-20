@@ -2,8 +2,10 @@ import axios from 'axios';
 import { PANDASCORE_API_KEY } from '../../../config/env';
 import { TEAM } from '../../../config/team';
 import type { Match } from './types';
+import { getCached } from '../../../database/cache';
+import { CACHE } from '../../../config/cache';
 
-export async function getLastMatches(): Promise<Match[]> {
+async function fetchLastMatches(): Promise<Match[]> {
     const response = await axios.get<Match[]>('https://api.pandascore.co/csgo/matches/past', {
         params: {
             'filter[opponent_id]': TEAM.id,
@@ -15,7 +17,10 @@ export async function getLastMatches(): Promise<Match[]> {
         },
         timeout: 5000,
     });
- 
     const matches: Match[] = response.data;
     return matches;
+}
+
+export async function getLastMatches(): Promise<Match[]> {
+    return getCached(CACHE.lastMatches.key, CACHE.lastMatches.ttlMs, fetchLastMatches);
 }
