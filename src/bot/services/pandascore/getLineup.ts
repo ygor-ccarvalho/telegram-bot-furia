@@ -2,18 +2,10 @@ import { PANDASCORE_API_KEY } from '../../../config/env';
 import axios from 'axios';
 import { TEAM } from '../../../config/team';
 import type { Player } from './types';
+import { getCached } from '../../../database/cache';
+import { CACHE } from '../../../config/cache';
 
-const cache: { players: { lineup: Player[], expires: number } } = {
-    players: {
-        lineup: [],
-        expires: 0
-    }
-};
-
-export async function getLineup(): Promise<Player[]> {
-
-    if (Date.now() < cache.players.expires) return cache.players.lineup;
-
+async function fetchLineup(): Promise<Player[]> {
     const playersResponse = await axios.get<Player[]>('https://api.pandascore.co/csgo/players', {
         params: {
             'filter[team_id]': TEAM.id,
@@ -24,10 +16,10 @@ export async function getLineup(): Promise<Player[]> {
         },
         timeout: 8000,
     });
-
     const players = playersResponse.data.filter((player) => !TEAM.coaches.includes(player.name.toLowerCase()));
-
-    cache.players = { lineup: players, expires: Date.now() + 3600000 }
-
     return players;
+}
+
+export async function getLineup(): Promise<Player[]> {
+    return getCached(CACHE.lineup.key, CACHE.lineup.ttlMs, fetchLineup);
 }
