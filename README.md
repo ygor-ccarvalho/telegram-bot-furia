@@ -26,6 +26,7 @@ Bot de Telegram em **Node.js + TypeScript** com os próximos jogos, os resultado
 - **[grammY](https://grammy.dev)**: framework do Telegram (long polling)
 - **axios**: chamadas HTTP com timeout
 - **dotenv**: variáveis de ambiente
+- **[MongoDB Atlas](https://www.mongodb.com/atlas)** (driver `mongodb`): cache com expiração automática
 - **[PandaScore API](https://pandascore.co)**: jogos e lineup
 - **DRAFT5** (`api.draft5.gg`, não oficial): notícias
 
@@ -36,7 +37,10 @@ flowchart LR
     U[Usuário] --> T[Telegram]
     T --> C[commands / callbacks]
     C --> S[services]
-    S --> A[(PandaScore / DRAFT5)]
+    S --> K{cache válido?}
+    K -- sim --> DB[(MongoDB)]
+    K -- não --> A[(PandaScore / DRAFT5)]
+    A -. grava .-> DB
     S --> M[mappers]
     M --> F[formatters]
     F --> C
@@ -45,10 +49,14 @@ flowchart LR
 
 ```
 src/
-├── index.ts                # Liga o bot (polling) e trata os sinais de desligamento
+├── index.ts                # Conecta o Mongo, liga o bot (polling) e trata o desligamento
 ├── config/
 │   ├── env.ts              # Único arquivo que lê o process.env; valida as variáveis
-│   └── team.ts             # IDs e dados do time
+│   ├── team.ts             # IDs e dados do time
+│   └── cache.ts            # Chave e TTL de cada recurso
+├── database/
+│   ├── mongo.ts            # Conexão única (singleton) e índice TTL
+│   └── cache.ts            # getCached(key, ttl, fetcher)
 └── bot/
     ├── bot.ts              # Monta o bot: composers, ordem e bot.catch
     ├── callbackHandlers.ts # Botões do menu
@@ -75,11 +83,26 @@ src/
 - **HTML + `escapeHtml`** em todo dado externo, porque o Markdown quebra com `_`, `*` e `[` em nomes e títulos.
 - **`sort` explícito e `scheduled_at`** (horário agendado), sem depender da ordem padrão da API.
 - **Duas redes de erro:** o `bot.catch` loga sem derrubar o bot, e o `unhandledRejection` pega o que escapar.
-- **Cache em memória** (lineup 1h, notícias 15 min) para evitar o erro 429 (limite de requisições).
+
+### Cache no MongoDB
+
+| Recurso | Chave | TTL |
+|---|---|---|
+| Próximos jogos | `next-matches:{id}` | 5 min |
+| Últimos jogos | `last-matches:{id}` | 30 min |
+| Lineup | `lineup:{id}` | 1 h |
+| Notícias | `news:{draft5Id}` | 15 min |
+
+- **Por quê:** evita o erro 429 (limite de requisições) e sobrevive a reinícios, ao contrário do cache em memória.
+- **Um único `getCached(key, ttl, fetcher)`:** cada service mantém o nome e o retorno; só passa a função de busca. Os commands não sabem que o cache existe.
+- **Expiração em duas camadas:** o índice TTL (`expireAfterSeconds: 0`) apaga os documentos vencidos, e a leitura filtra `expiresAt > agora`, porque o Mongo só limpa a cada ~60 s.
+- **Degradação graciosa:** se o Mongo cair, o bot fica mais lento, mas nunca quebra. Cada acesso ao banco tem o próprio `try`; o erro da API sobe até o comando e **nunca é gravado no cache**.
+- **Cache guarda o dado do service**, não o texto formatado: mudar a formatação não exige limpar o cache.
+- **TTL por volatilidade:** jogo muda rápido, lineup quase nunca.
 
 ## 🧪 Rodando localmente
 
-**Requisitos:** Node 20+, um token do [@BotFather](https://t.me/BotFather) e uma chave da [PandaScore](https://app.pandascore.co).
+**Requisitos:** Node 20+, um token do [@BotFather](https://t.me/BotFather), uma chave da [PandaScore](https://app.pandascore.co) e um cluster do [MongoDB Atlas](https://www.mongodb.com/atlas) (o plano grátis basta).
 
 ```bash
 git clone https://github.com/ygor-ccarvalho/telegram-bot-furia.git
@@ -88,6 +111,15 @@ npm ci
 cp .env.example .env   # preencha os valores
 npm run dev
 ```
+
+| Variável | Descrição |
+|---|---|
+| `TELEGRAM_BOT_TOKEN` | Token do bot (BotFather) |
+| `PANDASCORE_API_KEY` | Chave da PandaScore |
+| `MONGODB_URI` | String de conexão do Atlas |
+| `MONGODB_DB` | Nome do banco |
+
+Todas são obrigatórias: se faltar alguma, o bot não inicia.
 
 | Script | O que faz |
 |---|---|
@@ -98,12 +130,13 @@ npm run dev
 ## ⚠️ Limitações conhecidas
 
 - A API do DRAFT5 não é oficial e pode mudar sem aviso.
-- O cache fica em memória: é perdido quando o bot reinicia e não é compartilhado entre instâncias.
+- Se o Mongo estiver fora na inicialização, o bot roda sem cache até reiniciar.
 - Ainda não há testes automatizados.
 
 ## 🗺️ Próximos passos
 
 - [ ] Deploy 24/7 (Waifly)
+- [x] Cache no MongoDB Atlas (TTL index)
 - [ ] Testes dos mappers e formatters (funções puras)
-- [ ] Cache e cadastro de usuários no MongoDB Atlas (TTL index)
+- [ ] Cadastro de usuários no MongoDB
 - [ ] Notificações de jogos e notícias
