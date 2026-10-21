@@ -1,15 +1,11 @@
 import axios from 'axios';
 import { TEAM } from '../../../config/team';
 import type { Draft5Response, Noticia } from './types';
+import { getCached } from '../../../database/cache';
+import { CACHE } from '../../../config/cache';
 
-const CACHE_TTL_MS = 15 * 60 * 1000;
-const cache: { data: Noticia[]; expires: number } = { data: [], expires: 0 };
-
-export async function getNews(): Promise<Noticia[]> {
-
-    if (Date.now() < cache.expires) return cache.data;
-
-    const noticiasResponse = await axios.get<Draft5Response>(`https://api.draft5.gg/news`, {
+async function fetchNews(): Promise<Noticia[]> {
+    const noticiasResponse = await axios.get<Draft5Response>('https://api.draft5.gg/news', {
         params: {
             page: 1,
             amount: 10,
@@ -27,9 +23,9 @@ export async function getNews(): Promise<Noticia[]> {
             imagem: n.postImage,
             resumo: n.postExcerpt ?? '',
         }));
-
-    cache.data = noticias;
-    cache.expires = Date.now() + CACHE_TTL_MS;
-
     return noticias;
+}
+
+export async function getNews(): Promise<Noticia[]> {
+    return getCached(CACHE.news.key, CACHE.news.ttlMs, fetchNews);
 }
